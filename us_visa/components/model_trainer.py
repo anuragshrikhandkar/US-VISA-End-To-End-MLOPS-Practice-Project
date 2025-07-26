@@ -1,6 +1,5 @@
-import sys
 from typing import Tuple
-
+import sys
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
