@@ -2,11 +2,11 @@
 MLOPS Pratice Project 
 
 ## workflows 
- constants 
- entity
- components
- pipeline 
- main file
+ 1.constants 
+ 2.entity
+ 3.components
+ 4.pipeline 
+ 5.main file
 
 
  ## Key Technologies
@@ -53,3 +53,79 @@ export MONGODB_URL="mongodb+srv://<username>:<password>...."
 export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
 
 export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
+
+
+## AWS-CICD-Deployment-with-Github-Actions
+1. Logging AWS CONSOLE
+2. CREATE A IAM USER FOR DEPLOYMNENT
+
+#with specific access
+
+1. EC2 access : It is virtual machine
+
+2. ECR: Elastic Container registry to save your docker image in aws
+
+
+#Description: About the deployment
+
+1. Build docker image of the source code
+
+2. Push your docker image to ECR
+
+3. Launch Your EC2 
+
+4. Pull Your image from ECR in EC2
+
+5. Lauch your docker image in EC2
+
+#Policy:
+
+1. AmazonEC2ContainerRegistryFullAccess
+
+2. AmazonEC2FullAccess   
+
+## Create ECR repo to store/save docker image
+- Save the URI:
+
+## Create EC2 machine (Ubuntu)
+
+## Open EC2 and Install docker in EC2 Machine:
+
+#optinal
+
+sudo apt-get update -y
+
+sudo apt-get upgrade
+
+#required
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+
+sudo sh get-docker.sh
+
+sudo usermod -aG docker ubuntu
+
+newgrp docker
+
+## Configure EC2 as self-hosted runner:
+
+setting>actions>runner>new self hosted runner> choose os> then run command one by one
+
+## Setup github secrets:
+
+1.AWS_ACCESS_KEY_ID
+2.AWS_SECRET_ACCESS_KEY
+3.AWS_DEFAULT_REGION
+4.ECR_REPO
+
+
+
+
+
+
+<img width="1919" height="1079" alt="Screenshot 2025-07-30 214624" src="https://github.com/user-attachments/assets/8c7a3788-006a-4b80-8d47-5f9331c06ba7" />
+
+
+<img width="1914" height="865" alt="Screenshot 2025-07-30 214810" src="https://github.com/user-attachments/assets/e10799c0-d051-4b68-b8a7-52a334f14f64" />
+
+<img width="1907" height="1060" alt="Screenshot 2025-07-30 214824" src="https://github.com/user-attachments/assets/5978b29c-7a9d-4884-a254-473b9e9f3066" />
