@@ -3,152 +3,628 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>US Visa Approval Prediction</title>
+    <title>US Visa Predictor — Beautiful UI</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- AOS (scroll reveal) -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/555/555526.png" />
 
     <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-        background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/USA_passport_visa_stamp.jpg/1920px-USA_passport_visa_stamp.jpg') no-repeat center center fixed;
-        background-size: cover;
-        backdrop-filter: blur(3px);
-        color: #333;
-        animation: fadeInBody 1.5s ease;
+      /* =============================
+         THEME TOKENS
+         ============================= */
+      :root {
+        --bg: #0b1220;
+        --bg-soft: #0f172a;
+        --card: rgba(255, 255, 255, 0.08);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --primary: #2563eb; /* blue-600 */
+        --primary-2: #ef4444; /* red-500 */
+        --ring: rgba(37, 99, 235, 0.55);
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        --ok: #10b981;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+        --gradient-hero: linear-gradient(135deg, rgba(37, 99, 235, .16), rgba(239, 68, 68, .16));
+      }
+      [data-theme="light"] {
+        --bg: #f8f9fb;
+        --bg-soft: #ffffff;
+        --card: rgba(255, 255, 255, 0.9);
+        --text: #0f172a;
+        --muted: #475569;
+        --primary: #1d4ed8;
+        --primary-2: #dc2626;
+        --ring: rgba(29, 78, 216, 0.35);
+        --shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        --gradient-hero: linear-gradient(135deg, rgba(29, 78, 216, .12), rgba(220, 38, 38, .12));
       }
 
-      @keyframes fadeInBody {
-        from { opacity: 0; }
-        to { opacity: 1; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        color: var(--text);
+        background: radial-gradient(1200px 600px at -10% -10%, rgba(37, 99, 235, .22), transparent 60%),
+                    radial-gradient(900px 500px at 110% 10%, rgba(239, 68, 68, .22), transparent 60%),
+                    linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+        overflow-x: hidden;
+      }
+
+      /* Animated background stars/particles */
+      .stars {
+        position: fixed; inset: 0; pointer-events: none; z-index: 0;
+        background: repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.12) 0 1px, transparent 2px 40px),
+                    repeating-radial-gradient(circle at 80% 10%, rgba(255,255,255,.08) 0 1px, transparent 2px 50px),
+                    repeating-radial-gradient(circle at 60% 70%, rgba(255,255,255,.06) 0 1px, transparent 2px 60px);
+        animation: twinkle 10s linear infinite;
+        filter: blur(.3px);
+      }
+      @keyframes twinkle {
+        0% { transform: translateY(0); opacity: .8; }
+        50% { transform: translateY(-10px); opacity: 1; }
+        100% { transform: translateY(0); opacity: .8; }
+      }
+
+      .glass-card {
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, .06);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(8px);
+        position: relative; z-index: 1;
       }
 
       .navbar {
-        background: linear-gradient(to right, #b22234, #3c3b6e);
+        background: linear-gradient(90deg, var(--primary-2), var(--primary));
+        position: sticky; top: 0; z-index: 10;
       }
 
-      .card {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 16px;
-        animation: fadeInUp 1s ease;
+      .brand-mark {
+        display: inline-flex; align-items: center; gap: .6rem; font-weight: 700;
+      }
+      .brand-badge {
+        font-size: .72rem; padding: .2rem .5rem; border-radius: 999px; background: rgba(255, 255, 255, .22);
       }
 
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(40px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      /* Hero */
+      .hero {
+        position: relative; overflow: hidden;
+        border-radius: 24px; padding: 2.25rem; background: var(--gradient-hero);
+        border: 1px dashed rgba(255, 255, 255, .12);
+        isolation: isolate;
+      }
+      .hero h1 { font-weight: 800; letter-spacing: .2px; }
+      .hero .bullets i { width: 28px; text-align: center; }
+      .hero::after {
+        content: ""; position: absolute; inset: -40%; border-radius: 50%; z-index: -1;
+        background: conic-gradient(from 0deg, rgba(255,255,255,.04), transparent 30%, rgba(255,255,255,.04));
+        animation: spin-slow 18s linear infinite;
+      }
+      @keyframes spin-slow { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+      /* Waving US flag ribbon */
+      .flag-ribbon {
+        position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; opacity: .2;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg');
+        background-size: cover; border-radius: 50%; filter: blur(1px);
+        animation: wave 6s ease-in-out infinite;
+        mask-image: radial-gradient(circle at 60% 40%, black 50%, transparent 70%);
+      }
+      @keyframes wave { 0%,100% { transform: translateY(0) rotate(0deg);} 50% { transform: translateY(-8px) rotate(2deg);} }
+
+      .form-floating > label { color: var(--muted); }
+      .form-control, .form-select {
+        background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .18);
+        color: var(--text);
+        transition: transform .15s ease, box-shadow .2s ease;
+      }
+      .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 .25rem var(--ring); border-color: transparent; transform: translateY(-1px);
+      }
+      .input-group-text { background: rgba(255,255,255,.08); color: var(--muted); border: 1px solid rgba(255,255,255,.18); }
+
+      .switch { --h: 38px; display:flex; align-items:center; gap:.65rem; }
+      .switch input[type="checkbox"] { display:none; }
+      .toggle {
+        width: 54px; height: var(--h); background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+        border-radius: 999px; position: relative; cursor: pointer; transition: .25s ease; box-shadow: inset 0 0 0 2px rgba(0,0,0,.06);
+      }
+      .toggle::after {
+        content: ""; position: absolute; top: 4px; left: 4px; width: calc(var(--h) - 8px); height: calc(var(--h) - 8px);
+        background: #fff; border-radius: 999px; transition: .25s ease; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      }
+      .switch input:checked + .toggle { background: rgba(37,99,235,.55); }
+      .switch input:checked + .toggle::after { transform: translateX(16px); }
+
+      .btn-gradient {
+        --g: linear-gradient(90deg, var(--primary-2), var(--primary));
+        background: var(--g); border: none; color: #fff; font-weight: 700;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, .35);
+        transition: transform .15s ease, filter .15s ease, box-shadow .2s ease;
+      }
+      .btn-gradient:hover { filter: brightness(1.05); transform: translateY(-1px) scale(1.01); }
+      .btn-ghost { border: 1px solid rgba(255,255,255,.3); color: var(--text); background: transparent; }
+
+      .tooltip-inner { max-width: 260px; text-align: left; }
+
+      .result-card { border-left: 6px solid var(--primary); }
+      .result-badge { font-size:.8rem; }
+
+      footer { color: var(--muted); }
+      footer a { color: var(--text); }
+
+      .flag { width: 22px; height: 14px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset; }
+
+      @keyframes floatY { from { transform: translateY(0);} 50% { transform: translateY(-6px);} to { transform: translateY(0);} }
+      .floaty { animation: floatY 4s ease-in-out infinite; }
+
+      /* Visa themed chips */
+      .chip {
+        display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .6rem; border-radius:999px;
+        border:1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); font-size:.8rem;
       }
 
-      .form-label {
-        font-weight: 500;
+      /* Animated divider */
+      .stripe-divider { height: 8px; background: repeating-linear-gradient(45deg, var(--primary), var(--primary) 10px, var(--primary-2) 10px, var(--primary-2) 20px); border-radius: 999px; opacity:.2; }
+
+      /* Hover lift for cards */
+      .lift:hover { transform: translateY(-2px); transition: transform .2s ease; }
+
+      /* Confetti */
+      .confetti { position: fixed; inset: 0; pointer-events:none; z-index: 9999; }
+
+      /* Mini timeline */
+      .timeline {
+        border-left: 3px dashed rgba(255,255,255,.2); padding-left: 1rem;
+      }
+      .timeline .dot { width:10px; height:10px; border-radius:50%; background: var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.25); }
+
+      /* Parallax hero image wrapper */
+      .parallax {
+        transform: translateZ(0); will-change: transform; transition: transform .8s cubic-bezier(.2,.6,0,1);
+      }
+      .parallax:hover { transform: translateY(-6px) scale(1.02); }
+
+      /* CTA ribbon */
+      .cta-ribbon {
+        position: relative; overflow: hidden;
+      }
+      .cta-ribbon::before {
+        content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+        transform: translateX(-100%); animation: shine 4s infinite;
+      }
+      @keyframes shine { 0% { transform: translateX(-100%);} 50% { transform: translateX(100%);} 100% { transform: translateX(100%);} }
+
+      /* Visa Stamp badge */
+      .visa-stamp {
+        border: 2px dashed rgba(255,255,255,.35); padding:.35rem .6rem; border-radius: .5rem; transform: rotate(-3deg);
+        letter-spacing: 1px; font-weight: 700; text-transform: uppercase; opacity:.8;
       }
 
-      .btn-primary {
-        background: linear-gradient(90deg, #b22234, #3c3b6e);
-        border: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background: linear-gradient(90deg, #8b1a1a, #202064);
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-
-      .result-box {
-        font-size: 1.2rem;
-        animation: glowText 1.5s infinite alternate;
-        color: #3c3b6e;
-      }
-
-      @keyframes glowText {
-        from { text-shadow: 0 0 3px #b22234; }
-        to { text-shadow: 0 0 10px #3c3b6e; }
-      }
-
-      footer {
-        background-color: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        font-size: 0.95rem;
-        padding-top: 10px;
-      }
-
-      .developer-credit {
-        font-size: 0.9rem;
-        color: #ddd;
-        font-style: italic;
-        margin-top: 4px;
+      /* Media tweaks */
+      @media (max-width: 576px) {
+        .hero { padding: 1.25rem; }
       }
     </style>
   </head>
+
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-      <div class="container">
-        <a class="navbar-brand fw-bold" href="#">🇺🇸 US Visa Predictor</a>
-      </div>
-    </nav>
+    <div class="stars"></div>
 
-    <div class="container mt-5 mb-5">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card shadow-lg p-4">
-            <h3 class="mb-4 text-center text-primary">Visa Approval Prediction Form</h3>
-            <form action="/" method="post">
-              {% for field in [
-                'continent', 'education_of_employee', 'has_job_experience',
-                'requires_job_training', 'no_of_employees', 'region_of_employment',
-                'prevailing_wage', 'unit_of_wage', 'full_time_position', 'company_age'
-              ] %}
-              <div class="mb-3">
-                <label for="{{ field }}" class="form-label text-capitalize">{{ field.replace('_', ' ') }}</label>
-                {% if field in ['no_of_employees', 'prevailing_wage', 'company_age'] %}
-                  <input type="number" class="form-control" name="{{ field }}" id="{{ field }}" required />
-                {% else %}
-                  <select class="form-select" name="{{ field }}" id="{{ field }}" required>
-                    <option disabled selected>Select {{ field.replace('_', ' ') }}</option>
-                    {% if field == 'continent' %}
-                      <option>Asia</option><option>Africa</option><option>North America</option><option>Europe</option><option>South America</option><option>Oceania</option>
-                    {% elif field == 'education_of_employee' %}
-                      <option>High School</option><option>Bachelor's</option><option>Master's</option><option>Doctorate</option>
-                    {% elif field in ['has_job_experience', 'requires_job_training', 'full_time_position'] %}
-                      <option>Y</option><option>N</option>
-                    {% elif field == 'region_of_employment' %}
-                      <option>West</option><option>Northeast</option><option>South</option><option>Midwest</option><option>Island</option>
-                    {% elif field == 'unit_of_wage' %}
-                      <option>Hour</option><option>Day</option><option>Week</option><option>Month</option><option>Year</option>
-                    {% endif %}
-                  </select>
-                {% endif %}
-              </div>
-              {% endfor %}
-
-              <div class="d-grid mt-4">
-                <button class="btn btn-primary btn-lg" type="submit">Predict Visa Status</button>
-              </div>
-            </form>
-
-            {% if context %}
-            <div class="alert alert-info mt-4 text-center fw-bold result-box">
-              Visa Prediction Result: {{ context }}
-            </div>
-            {% endif %}
+    <!-- THEME ROOT -->
+    <div id="app" data-theme="dark">
+      <!-- NAVBAR -->
+      <nav class="navbar navbar-dark py-3">
+        <div class="container">
+          <a class="navbar-brand brand-mark" href="#">
+            <img class="flag" alt="US flag" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg" />
+            <span>US Visa Predictor</span>
+            <span class="brand-badge ms-2">ML powered</span>
+          </a>
+          <div class="d-flex align-items-center gap-2">
+            <span class="chip d-none d-md-inline"><i class="fa-solid fa-passport"></i>Visa Theme</span>
+            <button id="themeToggle" class="btn btn-sm btn-ghost cta-ribbon" type="button" aria-label="Toggle theme">
+              <i class="fa-solid fa-moon me-1"></i><span class="d-none d-sm-inline">Theme</span>
+            </button>
+            <a class="btn btn-sm btn-ghost" href="https://www.linkedin.com/in/anurag-shrikhandkar" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+            <a class="btn btn-sm btn-ghost" href="https://www.youtube.com/@yourchannel" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+            <a class="btn btn-sm btn-ghost" href="https://www.instagram.com/yourprofile" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
-      </div>
+      </nav>
+
+      <!-- HERO -->
+      <header class="container my-4">
+        <div class="hero" data-aos="fade-up" data-aos-duration="800">
+          <div class="flag-ribbon"></div>
+          <div class="row align-items-center g-3 g-lg-4">
+            <div class="col-lg-7">
+              <div class="visa-stamp mb-3 d-inline-block"><i class="fa-solid fa-building-columns me-1"></i> U.S. Immigration</div>
+              <h1 class="display-6 mb-2">Predict your <span class="text-decoration-underline" style="text-underline-offset:6px">visa decision</span> with clarity</h1>
+              <p class="mb-3 text-secondary">A modern, clean interface to submit your details and get a machine‑learning prediction in seconds.</p>
+              <div class="bullets small text-secondary">
+                <div class="d-flex align-items-center mb-1"><i class="fa-regular fa-circle-check me-2"></i>Accessible, responsive design</div>
+                <div class="d-flex align-items-center mb-1"><i class="fa-regular fa-circle-check me-2"></i>Dark / light theme, one click</div>
+                <div class="d-flex align-items-center"><i class="fa-regular fa-circle-check me-2"></i>Clean inputs with helpful tips</div>
+              </div>
+              <div class="mt-3 d-flex gap-2">
+                <span class="chip"><i class="fa-solid fa-earth-americas"></i>USA</span>
+                <span class="chip"><i class="fa-solid fa-briefcase"></i>Employment</span>
+                <span class="chip"><i class="fa-solid fa-scale-balanced"></i>Compliance</span>
+              </div>
+            </div>
+            <div class="col-lg-5 text-center text-lg-end">
+              <!-- Immigration themed image -->
+              <img class="img-fluid floaty parallax" alt="Airport immigration" width="280" height="280" src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" />
+              <div class="small text-secondary mt-2">Illustration: Immigration control</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="container mb-3"><div class="stripe-divider"></div></div>
+
+      <!-- MAIN -->
+      <main class="container pb-5">
+        <div class="row g-4">
+          <!-- FORM -->
+          <div class="col-lg-7" data-aos="fade-up" data-aos-duration="800">
+            <form class="glass-card p-4 lift" action="/" method="post" id="visaForm">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 m-0"><i class="fa-solid fa-file-signature me-2"></i>Visa Approval Prediction Form</h2>
+                <span class="badge text-bg-primary-subtle result-badge"><i class="fa-solid fa-shield-heart me-1"></i> Secure</span>
+              </div>
+
+              <!-- Education -->
+              <div class="form-floating mb-3">
+                <select class="form-select" id="education_of_employee" name="education_of_employee" required>
+                  <option value="" selected>Select education</option>
+                  <option>High School</option>
+                  <option>Bachelor's</option>
+                  <option>Master's</option>
+                  <option>Doctorate</option>
+                </select>
+                <label for="education_of_employee">Education of employee</label>
+              </div>
+
+              <!-- Experience -->
+              <div class="mb-3 d-flex justify-content-between align-items-center switch">
+                <label class="form-label m-0" for="has_job_experience">Has job experience?</label>
+                <input type="checkbox" id="has_job_experience_ck" />
+                <span class="toggle" role="switch" aria-checked="false" tabindex="0"></span>
+                <input type="hidden" name="has_job_experience" id="has_job_experience" value="N" />
+                <span class="small text-secondary" id="expLabel">N</span>
+              </div>
+
+              <!-- Training -->
+              <div class="mb-3 d-flex justify-content-between align-items-center switch">
+                <label class="form-label m-0" for="requires_job_training">Requires job training?</label>
+                <input type="checkbox" id="requires_job_training_ck" />
+                <span class="toggle" role="switch" aria-checked="false" tabindex="0"></span>
+                <input type="hidden" name="requires_job_training" id="requires_job_training" value="N" />
+                <span class="small text-secondary" id="trainLabel">N</span>
+              </div>
+
+              <!-- Employees -->
+              <div class="form-floating mb-3" data-bs-toggle="tooltip" data-bs-title="Total number of employees in the company (approximate).">
+                <input type="number" class="form-control" id="no_of_employees" name="no_of_employees" min="1" step="1" placeholder="200" required />
+                <label for="no_of_employees">No. of employees</label>
+              </div>
+
+              <!-- Region -->
+              <div class="form-floating mb-3">
+                <select class="form-select" id="region_of_employment" name="region_of_employment" required>
+                  <option value="" selected>Select region</option>
+                  <option>West</option>
+                  <option>Northeast</option>
+                  <option>South</option>
+                  <option>Midwest</option>
+                  <option>Island</option>
+                </select>
+                <label for="region_of_employment">Region of employment</label>
+              </div>
+
+              <!-- Wage + Unit -->
+              <div class="mb-3">
+                <label class="form-label" for="prevailing_wage">Prevailing wage</label>
+                <div class="input-group">
+                  <span class="input-group-text" id="currency">USD</span>
+                  <input type="number" class="form-control" id="prevailing_wage" name="prevailing_wage" min="0" step="0.01" placeholder="60000" required />
+                  <select class="form-select" id="unit_of_wage" name="unit_of_wage" style="max-width: 160px" aria-label="Unit of wage" required>
+                    <option>Year</option>
+                    <option>Month</option>
+                    <option>Week</option>
+                    <option>Day</option>
+                    <option>Hour</option>
+                  </select>
+                </div>
+                <div class="form-text">Amount is assumed in USD by default.</div>
+              </div>
+
+              <!-- Full-time -->
+              <div class="mb-3 d-flex justify-content-between align-items-center switch">
+                <label class="form-label m-0" for="full_time_position">Full‑time position?</label>
+                <input type="checkbox" id="full_time_position_ck" checked />
+                <span class="toggle" role="switch" aria-checked="true" tabindex="0"></span>
+                <input type="hidden" name="full_time_position" id="full_time_position" value="Y" />
+                <span class="small text-secondary" id="fulltimeLabel">Y</span>
+              </div>
+
+              <!-- Company age -->
+              <div class="form-floating mb-4" data-bs-toggle="tooltip" data-bs-title="How many years has the company been operating?">
+                <input type="number" class="form-control" id="company_age" name="company_age" min="0" step="1" placeholder="10" required />
+                <label for="company_age">Company age (years)</label>
+              </div>
+
+              <div class="d-grid gap-2 d-sm-flex justify-content-end">
+                <button type="reset" class="btn btn-ghost">
+                  <i class="fa-regular fa-rotate-left me-1"></i>Reset
+                </button>
+                <button type="submit" id="submitBtn" class="btn btn-gradient cta-ribbon">
+                  <span class="btn-label"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Predict Visa Status</span>
+                  <span class="btn-wait d-none"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Predicting…</span>
+                </button>
+              </div>
+
+              <!-- Process timeline (visa theme) -->
+              <div class="timeline pt-4 mt-4 text-secondary small">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                  <div class="dot mt-1"></div>
+                  <div><strong>Step 1:</strong> Enter details accurately.</div>
+                </div>
+                <div class="d-flex align-items-start gap-3 mb-3">
+                  <div class="dot mt-1" style="background: var(--warn);"></div>
+                  <div><strong>Step 2:</strong> Our model normalizes wages (per selected unit).</div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                  <div class="dot mt-1" style="background: var(--ok);"></div>
+                  <div><strong>Step 3:</strong> View prediction with confidence badge.</div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- SIDEBAR -->
+          <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
+            <div class="glass-card p-4 mb-4 lift">
+              <h3 class="h6 mb-3"><i class="fa-solid fa-lightbulb me-2"></i>Tips to improve accuracy</h3>
+              <ul class="small m-0 text-secondary">
+                <li>Use realistic values for wages and company size.</li>
+                <li>Pick the correct employment region and unit of wage.</li>
+                <li>Ensure required training/experience toggles reflect the role.</li>
+              </ul>
+              <div class="mt-3 d-flex gap-2 flex-wrap">
+                <span class="chip"><i class="fa-solid fa-passport"></i> H‑1B</span>
+                <span class="chip"><i class="fa-solid fa-stamp"></i> LCA</span>
+                <span class="chip"><i class="fa-solid fa-landmark"></i> USCIS</span>
+              </div>
+            </div>
+
+            <!-- Prediction Result -->
+            {% if context %}
+            <div class="glass-card p-4 result-card lift" id="resultCard">
+              <div class="d-flex align-items-start gap-3">
+                <div class="display-6">🔮</div>
+                <div>
+                  <h4 class="h6 mb-1">Visa Prediction Result</h4>
+                  <p class="m-0 fs-6"><strong>{{ context }}</strong></p>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="glass-card p-4 text-secondary lift">
+              <div class="d-flex align-items-center gap-3">
+                <i class="fa-regular fa-message"></i>
+                <div class="small">Your prediction will appear here after you submit the form.</div>
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="text-center mt-4" data-aos="zoom-in" data-aos-delay="150">
+              <!-- Additional immigration themed image -->
+              <img class="img-fluid floaty" alt="US Visa" width="160" height="160" src="https://cdn-icons-png.flaticon.com/512/1636/1636036.png" />
+              <div class="small text-secondary mt-2">Illustration: Air travel & visas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRUST STRIP -->
+        <section class="mt-5" data-aos="fade-up">
+          <div class="glass-card p-4">
+            <div class="row g-4 align-items-center">
+              <div class="col-md-3 text-center">
+                <i class="fa-solid fa-shield-halved display-6"></i>
+                <div class="mt-2">Privacy-first</div>
+              </div>
+              <div class="col-md-3 text-center">
+                <i class="fa-solid fa-gauge-high display-6"></i>
+                <div class="mt-2"><span class="count" data-target="97">0</span>% accuracy (demo)</div>
+              </div>
+              <div class="col-md-3 text-center">
+                <i class="fa-solid fa-check-double display-6"></i>
+                <div class="mt-2">Form validation</div>
+              </div>
+              <div class="col-md-3 text-center">
+                <i class="fa-solid fa-plane-departure display-6"></i>
+                <div class="mt-2">Immigration theme</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="container py-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+          <div class="small">© 2025 US Visa Predictor. All rights reserved.</div>
+          <div class="small">Developed by <strong>Anurag Shrikhandkar</strong></div>
+        </div>
+      </footer>
     </div>
 
-    <footer class="text-center py-4">
-      &copy; 2025 US Visa Predictor. All rights reserved.<br />
-      <span class="developer-credit">Developed by Anurag Shrikhandkar</span>
-    </footer>
+    <!-- Confetti canvas -->
+    <canvas class="confetti" id="confettiCanvas"></canvas>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+      // =============================
+      // Bootstrap tooltips
+      // =============================
+      [...document.querySelectorAll('[data-bs-toggle="tooltip"]')].forEach(el => new bootstrap.Tooltip(el));
+
+      // =============================
+      // Theme toggle with localStorage
+      // =============================
+      const root = document.getElementById('app');
+      const themeToggle = document.getElementById('themeToggle');
+      const STORAGE_KEY = 'uvp-theme';
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'light') root.setAttribute('data-theme', 'light');
+      themeToggle?.addEventListener('click', () => {
+        const isLight = root.getAttribute('data-theme') === 'light';
+        root.setAttribute('data-theme', isLight ? 'dark' : 'light');
+        localStorage.setItem(STORAGE_KEY, isLight ? 'dark' : 'light');
+      });
+
+      // =============================
+      // Fancy Y/N switches mapping
+      // =============================
+      function bindYN(ckId, hiddenId, labelId) {
+        const hidden = document.getElementById(hiddenId);
+        const ck = document.getElementById(ckId);
+        const label = document.getElementById(labelId);
+        const wrapper = ck.nextElementSibling; // the .toggle
+        const set = (v) => {
+          ck.checked = v; wrapper.setAttribute('aria-checked', v ? 'true' : 'false');
+          hidden.value = v ? 'Y' : 'N'; label.textContent = hidden.value;
+        };
+        set(hidden.value === 'Y');
+        wrapper.addEventListener('click', () => set(!ck.checked));
+        wrapper.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(!ck.checked); }});
+      }
+      bindYN('has_job_experience_ck', 'has_job_experience', 'expLabel');
+      bindYN('requires_job_training_ck', 'requires_job_training', 'trainLabel');
+      bindYN('full_time_position_ck', 'full_time_position', 'fulltimeLabel');
+
+      // =============================
+      // Submit button spinner UX
+      // =============================
+      const form = document.getElementById('visaForm');
+      const submitBtn = document.getElementById('submitBtn');
+      form?.addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitBtn.querySelector('.btn-label').classList.add('d-none');
+        submitBtn.querySelector('.btn-wait').classList.remove('d-none');
+        // fake confetti after short delay (you can trigger on actual server response)
+        setTimeout(() => {
+          launchConfetti();
+        }, 900);
+      });
+      form?.addEventListener('reset', () => {
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('.btn-label').classList.remove('d-none');
+          submitBtn.querySelector('.btn-wait').classList.add('d-none');
+        }, 0);
+      });
+
+      // =============================
+      // AOS init
+      // =============================
+      AOS.init({ once: true, offset: 60 });
+
+      // =============================
+      // Count-up animation for numbers
+      // =============================
+      const counters = document.querySelectorAll('.count');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target; const target = +el.dataset.target; let current = 0;
+          const step = Math.max(1, Math.floor(target / 60));
+          const tick = () => {
+            current += step; if (current >= target) { current = target; }
+            el.textContent = current;
+            if (current < target) requestAnimationFrame(tick);
+          };
+          tick(); io.unobserve(el);
+        });
+      }, { threshold: .6 });
+      counters.forEach(c => io.observe(c));
+
+      // =============================
+      // Lightweight confetti
+      // =============================
+      const cvs = document.getElementById('confettiCanvas');
+      const ctx = cvs.getContext('2d');
+      let pieces = []; let rafId; let active = false;
+      const colors = ['#ef4444','#2563eb','#ffffff','#f59e0b'];
+
+      function resize() {
+        cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize); resize();
+
+      function createPiece() {
+        return {
+          x: Math.random() * cvs.width,
+          y: -20,
+          r: 4 + Math.random() * 6,
+          c: colors[(Math.random() * colors.length) | 0],
+          v: 2 + Math.random() * 3,
+          a: Math.random() * Math.PI,
+          s: Math.random() * 0.05 + 0.02
+        };
+      }
+      function draw() {
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        pieces.forEach(p => {
+          p.y += p.v; p.a += p.s; const wobble = Math.sin(p.a) * 10;
+          ctx.fillStyle = p.c;
+          ctx.save(); ctx.translate(p.x + wobble, p.y); ctx.rotate(p.a);
+          ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r);
+          ctx.restore();
+        });
+        pieces = pieces.filter(p => p.y < cvs.height + 20);
+        if (active || pieces.length) rafId = requestAnimationFrame(draw); else cancelAnimationFrame(rafId);
+      }
+      function launchConfetti() {
+        active = true;
+        for (let i = 0; i < 160; i++) pieces.push(createPiece());
+        if (!rafId) draw();
+        setTimeout(() => { active = false; }, 1000);
+      }
+
+      // =============================
+      // Parallax tilt for hero image (very light)
+      // =============================
+      const parallax = document.querySelector('.parallax');
+      if (parallax) {
+        parallax.addEventListener('mousemove', (e) => {
+          const b = parallax.getBoundingClientRect();
+          const rx = ((e.clientX - b.left) / b.width - .5) * 4;
+          const ry = ((e.clientY - b.top) / b.height - .5) * -4;
+          parallax.style.transform = `translateY(-4px) scale(1.02) rotateX(${ry}deg) rotateY(${rx}deg)`;
+        });
+        parallax.addEventListener('mouseleave', () => {
+          parallax.style.transform = '';
+        });
+      }
+    </script>
   </body>
 </html>
