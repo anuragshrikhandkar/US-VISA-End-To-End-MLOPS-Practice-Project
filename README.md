@@ -119,13 +119,9 @@ setting>actions>runner>new self hosted runner> choose os> then run command one b
 4.ECR_REPO
 
 
+<img width="1919" height="1079" alt="Screenshot 2025-08-13 183809" src="https://github.com/user-attachments/assets/2c235908-0849-4758-a4c3-36fc6656e722" />
 
+<img width="1919" height="1079" alt="Screenshot 2025-08-13 183928" src="https://github.com/user-attachments/assets/13f97a1c-1285-48d5-bc15-93d9713c4545" />
 
+<img width="1919" height="1077" alt="Screenshot 2025-08-13 183403" src="https://github.com/user-attachments/assets/9182108a-5e5d-48c7-8dbc-18c272c5732c" />
 
-
-<img width="1919" height="1079" alt="Screenshot 2025-07-30 214624" src="https://github.com/user-attachments/assets/8c7a3788-006a-4b80-8d47-5f9331c06ba7" />
-
-
-<img width="1914" height="865" alt="Screenshot 2025-07-30 214810" src="https://github.com/user-attachments/assets/e10799c0-d051-4b68-b8a7-52a334f14f64" />
-
-<img width="1907" height="1060" alt="Screenshot 2025-07-30 214824" src="https://github.com/user-attachments/assets/5978b29c-7a9d-4884-a254-473b9e9f3066" />
